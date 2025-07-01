@@ -1,0 +1,57 @@
+name: 'Run Daft.ai Script'
+description: 'Run a Python script with the Daft.ai library'
+author: 'Your GitHub Username'
+inputs:
+  scriptfile:
+    description: 'Path to a Python script that imports daft (relative to the repository root)'
+    required: false
+  script:
+    description: 'Content of a Python script that imports daft'
+    required: false
+runs:
+  using: 'composite'
+  steps:
+    - name: Validate inputs
+      shell: bash
+      run: |
+        if [[ -z "${{ inputs.scriptfile }}" && -z "${{ inputs.script }}" ]]; then
+          echo "Error: Either 'scriptfile' or 'script' input parameter must be provided."
+          exit 1
+        fi
+        if [[ ! -z "${{ inputs.scriptfile }}" && ! -z "${{ inputs.script }}" ]]; then
+          echo "Error: Both 'scriptfile' and 'script' input parameters were provided. Please provide only one."
+          exit 1
+        fi
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+        cache: 'pip'
+    
+    - name: Install Daft
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        pip install daft
+    
+    - name: Run script file
+      if: inputs.scriptfile != ''
+      shell: bash
+      run: |
+        if [ ! -f "${{ inputs.scriptfile }}" ]; then
+          echo "Error: Script file not found at '${{ inputs.scriptfile }}'"
+          exit 1
+        fi
+        python "${{ inputs.scriptfile }}"
+    
+    - name: Run script content
+      if: inputs.script != ''
+      shell: bash
+      run: |
+        echo "${{ inputs.script }}" > daft_script.py
+        python daft_script.py
+        rm daft_script.py
+branding:
+  icon: 'cpu'
+  color: 'blue'
