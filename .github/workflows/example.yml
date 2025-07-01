@@ -20,4 +20,4 @@ jobs:
           daft_version: 'latest'
       - name: Show job summary
         run: |
-          echo "${{ steps.run_script.outputs.result }}" >> $GITHUB_STEP_SUMMARY
+          echo -e "\`\`\`\n${{ steps.run_script.outputs.result }}\n\`\`\`" >> $GITHUB_STEP_SUMMARY

@@ -26,7 +26,7 @@ jobs:
           # daft_version: '0.5.7'
       - name: Optionally, show script output in Job Summary (always shown in log)
         run: |
-          echo "${{ steps.run_script.outputs.result }}" >> $GITHUB_STEP_SUMMARY
+          echo -e "\`\`\`\n${{ steps.run_script.outputs.result }}\n\`\`\`" >> $GITHUB_STEP_SUMMARY
 ```
 
 ## Inputs
