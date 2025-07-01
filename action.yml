@@ -18,11 +18,13 @@ runs:
     - name: Validate inputs
       shell: bash
       run: |
-        if [[ -z "${{ inputs.script_file }}" && -z "${{ inputs.script }}" ]]; then
+        SCRIPT_FILE="${{ inputs.script_file }}"
+        SCRIPT="${{ inputs.script }}"
+        if [[ -z "$SCRIPT_FILE" && -z "$SCRIPT" ]]; then
           echo "Error: Either 'script_file' or 'script' input parameter must be provided."
           exit 1
         fi
-        if [[ ! -z "${{ inputs.script_file }}" && ! -z "${{ inputs.script }}" ]]; then
+        if [[ ! -z "$SCRIPT_FILE" && ! -z "$SCRIPT" ]]; then
           echo "Error: Both 'script_file' and 'script' input parameters were provided. Please provide only one."
           exit 1
         fi
@@ -51,16 +53,19 @@ runs:
       if: inputs.script_file != ''
       shell: bash
       run: |
-        if [ ! -f "${{ inputs.script_file }}" ]; then
-          echo "Error: Script file not found at '${{ inputs.script_file }}'"
+        SCRIPT_FILE="${{ inputs.script_file }}"
+        if [ ! -f "$SCRIPT_FILE" ]; then
+          echo "Error: Script file not found at '$SCRIPT_FILE'"
           exit 1
         fi
-        python "${{ inputs.script_file }}"
+        python "$SCRIPT_FILE"
     - name: Run script content
       if: inputs.script != ''
       shell: bash
       run: |
-        echo "${{ inputs.script }}" > daft_script.py
+        cat << 'EOF' > daft_script.py
+${{ inputs.script }}
+EOF
         python daft_script.py
         rm daft_script.py
 branding:
