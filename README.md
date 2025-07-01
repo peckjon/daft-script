@@ -10,7 +10,7 @@ jobs:
       - uses: actions/checkout@v3
       
       - name: Run Daft script from file
-        uses: your-username/daft-script@v1
+        uses: peckjon/daft-script@v1
         with:
           script_file: 'scripts/process_data.py'
           # Optional: specify a specific Daft version
@@ -31,7 +31,7 @@ jobs:
       - uses: actions/checkout@v3
       
       - name: Run Daft script with specific version
-        uses: your-username/daft-script@v1
+        uses: peckjon/daft-script@v1
         with:
           script: |
             import daft
@@ -110,7 +110,7 @@ result.show()
 
 ```yaml
 - name: Run Daft script
-  uses: your-username/daft-script@v1
+  uses: peckjon/daft-script@v1
   with:
     script: |
       import daft
