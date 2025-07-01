@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Run Daft script from file
-        uses: peckjon/daft-script@v1
+        uses: peckjon/daft-script@v1.0.1
         with:
           script_file: 'scripts/process_data.py'
           # Optional: specify a specific Daft version

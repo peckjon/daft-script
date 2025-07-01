@@ -18,6 +18,6 @@ jobs:
         with:
           script_file: 'example_script.py'
           daft_version: 'latest'
-      - name: Show job summary
+      - name: Show job summary (formatted as a code block)
         run: |
           echo -e "\`\`\`\n${{ steps.run_script.outputs.result }}\n\`\`\`" >> $GITHUB_STEP_SUMMARY
