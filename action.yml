@@ -63,9 +63,7 @@ runs:
       if: inputs.script != ''
       shell: bash
       run: |
-        cat <<'EOF' > daft_script.py
-${{ inputs.script }}
-EOF
+        printf "%s" "${{ inputs.script }}" > daft_script.py
         python daft_script.py
         rm daft_script.py
 branding:
