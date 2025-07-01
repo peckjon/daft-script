@@ -39,5 +39,5 @@ stats_df.show()
 
 # Show count of products by in-stock status
 print("\nProduct count by in-stock status:")
-in_stock_counts = df.groupby("in_stock").count()
+in_stock_counts = df.groupby("in_stock").agg(daft.col("product").count().alias("count"))
 in_stock_counts.show()
