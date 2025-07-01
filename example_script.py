@@ -1,5 +1,8 @@
 import daft
 
+# Print Daft version for information
+print(f"Using Daft version: {daft.__version__}")
+
 # Create a simple DataFrame
 df = daft.from_pydict({
     "product": ["Laptop", "Phone", "Tablet", "Monitor", "Headphones"],
@@ -24,19 +27,26 @@ result_df = sorted_df.with_column(
 print("Products in stock (sorted by price):")
 result_df.show()
 
-# Group by rating ranges
-print("\nProduct statistics by rating range:")
-rating_ranges = df.with_column(
-    "rating_range",
-    daft.when(daft.col("rating") < 4.0, "Below 4.0")
-    .when(daft.col("rating") < 4.5, "4.0-4.4")
-    .otherwise("4.5+")
-)
-
-# Calculate average price by rating range
-stats = rating_ranges.groupby("rating_range").agg(
-    daft.col("price").mean().alias("avg_price"),
-    daft.col("price").count().alias("count")
-)
-
-stats.show()
+# Simple statistics without using rating ranges
+print("\nPrice Statistics:")
+try:
+    stats = df.select([
+        daft.col("price").min().alias("min_price"),
+        daft.col("price").max().alias("max_price"),
+        daft.col("price").mean().alias("avg_price"),
+        daft.col("price").count().alias("count")
+    ])
+    stats.show()
+except Exception as e:
+    print(f"Error calculating statistics: {e}")
+    
+    # Fallback to simpler statistics
+    min_price = df.select(daft.col("price").min()).collect()[0][0]
+    max_price = df.select(daft.col("price").max()).collect()[0][0]
+    avg_price = df.select(daft.col("price").mean()).collect()[0][0]
+    count = df.select(daft.col("price").count()).collect()[0][0]
+    
+    print(f"Min price: {min_price}")
+    print(f"Max price: {max_price}")
+    print(f"Avg price: {avg_price}")
+    print(f"Count: {count}")
