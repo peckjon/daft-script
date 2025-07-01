@@ -2,48 +2,64 @@ name: 'Run Daft.ai Script'
 description: 'Run a Python script with the Daft.ai library'
 author: 'Your GitHub Username'
 inputs:
-  scriptfile:
-    description: 'Path to a Python script that imports daft (relative to the repository root)'
-    required: false
   script:
     description: 'Content of a Python script that imports daft'
     required: false
+  script_file:
+    description: 'Path to a Python script that imports daft (relative to the repository root)'
+    required: false
+  daft_version:
+    description: 'Version of Daft to install (default: latest)'
+    required: false
+    default: 'latest'
 runs:
   using: 'composite'
   steps:
     - name: Validate inputs
       shell: bash
       run: |
-        if [[ -z "${{ inputs.scriptfile }}" && -z "${{ inputs.script }}" ]]; then
-          echo "Error: Either 'scriptfile' or 'script' input parameter must be provided."
+        if [[ -z "${{ inputs.script_file }}" && -z "${{ inputs.script }}" ]]; then
+          echo "Error: Either 'script_file' or 'script' input parameter must be provided."
           exit 1
         fi
-        if [[ ! -z "${{ inputs.scriptfile }}" && ! -z "${{ inputs.script }}" ]]; then
-          echo "Error: Both 'scriptfile' and 'script' input parameters were provided. Please provide only one."
+        if [[ ! -z "${{ inputs.script_file }}" && ! -z "${{ inputs.script }}" ]]; then
+          echo "Error: Both 'script_file' and 'script' input parameters were provided. Please provide only one."
           exit 1
         fi
+    
+    - name: Create requirements file
+      shell: bash
+      run: |
+        # Create requirements file for caching
+        if [[ "${{ inputs.daft_version }}" == "latest" ]]; then
+          echo "daft" > requirements.txt
+        else
+          echo "daft==${{ inputs.daft_version }}" > requirements.txt
+        fi
+        echo "Created requirements.txt with: $(cat requirements.txt)"
     
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.x'
         cache: 'pip'
+        cache-dependency-path: requirements.txt
     
     - name: Install Daft
       shell: bash
       run: |
         python -m pip install --upgrade pip
-        pip install daft
+        pip install -r requirements.txt
     
     - name: Run script file
-      if: inputs.scriptfile != ''
+      if: inputs.script_file != ''
       shell: bash
       run: |
-        if [ ! -f "${{ inputs.scriptfile }}" ]; then
-          echo "Error: Script file not found at '${{ inputs.scriptfile }}'"
+        if [ ! -f "${{ inputs.script_file }}" ]; then
+          echo "Error: Script file not found at '${{ inputs.script_file }}'"
           exit 1
         fi
-        python "${{ inputs.scriptfile }}"
+        python "${{ inputs.script_file }}"
     
     - name: Run script content
       if: inputs.script != ''

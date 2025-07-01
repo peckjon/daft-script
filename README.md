@@ -1,6 +1,44 @@
-# Daft.ai Script Runner
+# Daft.ai Scri```yaml
+name: Run Daft Data Processing
 
-A GitHub Action for running [Daft.ai](https://daft.ai/) scripts. Daft is a fast and scalable data engine for complex data processing across any modality.
+on: [push]
+
+jobs:
+  process-data:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Run Daft script from file
+        uses: your-username/daft-script@v1
+        with:
+          script_file: 'scripts/process_data.py'
+          # Optional: specify a specific Daft version
+          # daft_version: '0.2.0'
+```
+
+For more control over the Daft version:
+
+```yaml
+name: Run Daft with Specific Version
+
+on: [workflow_dispatch]
+
+jobs:
+  run-with-specific-version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Run Daft script with specific version
+        uses: your-username/daft-script@v1
+        with:
+          script: |
+            import daft
+            print(f"Daft version: {daft.__version__}")
+            # Your Daft code here
+          daft_version: '0.2.0'  # Specify the version you need
+```Hub Action for running [Daft.ai](https://daft.ai/) scripts. Daft is a fast and scalable data engine for complex data processing across any modality.
 
 ## What is Daft.ai?
 
@@ -31,7 +69,7 @@ jobs:
 
 ## Inputs
 
-### `scriptfile`
+### `script_file`
 
 **Optional** Path to a Python script file that imports and uses the Daft library.
 
@@ -39,7 +77,11 @@ jobs:
 
 **Optional** Content of a Python script that imports and uses the Daft library.
 
-**Note:** You must provide either `scriptfile` OR `script`, but not both.
+### `daft_version`
+
+**Optional** Version of Daft to install (e.g., '0.2.0'). If not specified, the latest version will be installed.
+
+**Note:** You must provide either `script_file` OR `script`, but not both.
 
 ## Example Scripts
 

@@ -16,7 +16,7 @@ jobs:
       - name: Run example script file
         uses: ./
         with:
-          scriptfile: 'example_script.py'
+          script_file: 'example_script.py'
   
   run-inline-script:
     runs-on: ubuntu-latest
