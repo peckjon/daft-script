@@ -37,9 +37,7 @@ jobs:
 
 ### `daft_version`
 
-**Optional** Version of Daft to install (e.g., '0.2.0'). If not specified, the latest version will be installed.
-
-> **Note:** Only the `script_file` parameter is supported. Inline script content via a `script` parameter is no longer available.
+**Optional** Version of Daft to install (e.g., '0.5.7'). If not specified, the latest version will be installed.
 
 ## Example Scripts
 
