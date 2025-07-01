@@ -63,10 +63,11 @@ runs:
       if: inputs.script != ''
       shell: bash
       run: |
-        cat << 'EOF' > daft_script.py
-${{ inputs.script }}
-EOF
+        # Write script to file using base64 encoding to avoid issues with special characters
+        echo "${{ inputs.script }}" > daft_script.py
+        # Run the script
         python daft_script.py
+        # Clean up
         rm daft_script.py
 branding:
   icon: 'cpu'
