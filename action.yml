@@ -71,4 +71,4 @@ runs:
         rm daft_script.py
 branding:
   icon: 'cpu'
-  color: 'blue'
+  color: 'purple'
