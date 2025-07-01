@@ -63,9 +63,10 @@ runs:
       if: inputs.script != ''
       shell: bash
       run: |
-        echo "${{ inputs.script }}" > daft_script.py
-        python daft_script.py
-        rm daft_script.py
+        TMPFILE=$(mktemp)
+        echo "${{ inputs.script }}" > "$TMPFILE"
+        python "$TMPFILE"
+        rm "$TMPFILE"
 branding:
   icon: 'cpu'
   color: 'purple'
