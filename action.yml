@@ -9,6 +9,10 @@ inputs:
     description: 'Version of Daft to install (default: latest)'
     required: false
     default: 'latest'
+outputs:
+  result:
+    description: "Output from the script"
+    value: ${{ steps.run_script_step.outputs.result }}
 runs:
   using: 'composite'
   steps:
@@ -41,6 +45,7 @@ runs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     - name: Run script file
+      id: run_script_step
       shell: bash
       run: |
         SCRIPT_FILE="${{ inputs.script_file }}"
@@ -48,7 +53,11 @@ runs:
           echo "Error: Script file not found at '$SCRIPT_FILE'"
           exit 1
         fi
-        python "$SCRIPT_FILE"
+        output=$(python "$SCRIPT_FILE" 2>&1)
+        echo "$output"
+        echo "result<<EOF" >> $GITHUB_OUTPUT
+        echo "$output" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
 branding:
   icon: 'cpu'
   color: 'purple'

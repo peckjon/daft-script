@@ -18,13 +18,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
       - name: Run Daft script from file
         uses: peckjon/daft-script@v1
         with:
           script_file: 'scripts/process_data.py'
           # Optional: specify a specific Daft version
           # daft_version: '0.5.7'
+      - name: Optionally, show script output in Job Summary (always shown in log)
+        run: |
+          echo "${{ steps.run_script.outputs.result }}" >> $GITHUB_STEP_SUMMARY
 ```
 
 ## Inputs

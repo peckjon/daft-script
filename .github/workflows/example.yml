@@ -12,8 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
       - name: Run example script file
+        id: run_script
         uses: ./
         with:
           script_file: 'example_script.py'
+          daft_version: 'latest'
+      - name: Show job summary
+        run: |
+          echo "${{ steps.run_script.outputs.result }}" >> $GITHUB_STEP_SUMMARY
