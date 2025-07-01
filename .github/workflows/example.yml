@@ -17,27 +17,3 @@ jobs:
         uses: ./
         with:
           script_file: 'example_script.py'
-  
-  run-inline-script:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Run inline Daft script
-        uses: ./
-        with:
-          script: |
-            import daft
-            
-            # Create a DataFrame
-            df = daft.from_pydict({
-                "name": ["Alice", "Bob", "Charlie", "David", "Eve"],
-                "score": [85, 92, 78, 96, 88],
-            })
-            
-            # Calculate statistics
-            avg_score = df.select(daft.col("score").mean().alias("average_score"))
-            
-            # Show results
-            print("Average score:")
-            avg_score.show()

@@ -1,52 +1,10 @@
-# Daft.ai Scri```yaml
-name: Run Daft Data Processing
+# Daft.ai GitHub Action
 
-on: [push]
-
-jobs:
-  process-data:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Run Daft script from file
-        uses: peckjon/daft-script@v1
-        with:
-          script_file: 'scripts/process_data.py'
-          # Optional: specify a specific Daft version
-          # daft_version: '0.2.0'
-```
-
-For more control over the Daft version:
-
-```yaml
-name: Run Daft with Specific Version
-
-on: [workflow_dispatch]
-
-jobs:
-  run-with-specific-version:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Run Daft script with specific version
-        uses: peckjon/daft-script@v1
-        with:
-          script: |
-            import daft
-            print(f"Daft version: {daft.__version__}")
-            # Your Daft code here
-          daft_version: '0.2.0'  # Specify the version you need
-```Hub Action for running [Daft.ai](https://daft.ai/) scripts. Daft is a fast and scalable data engine for complex data processing across any modality.
+A GitHub Action for running [Daft.ai](https://daft.ai/) scripts. Daft is a fast and scalable data engine for complex data processing across any modality.
 
 ## What is Daft.ai?
 
 Daft is a modern, Python-native library designed for complex and multi-modal datasets. It's built to handle various data types including text, images, audio, and videos with high performance. Daft supports lazy evaluation and is optimized for distributed computing and data processing, with SQL and Python DataFrame interfaces as first-class citizens.
-
-## Usage
-
-This action sets up a Python environment with the Daft.ai library and runs your script. You can provide either a script file path or the script content directly.
 
 ### Example workflow
 
@@ -64,69 +22,71 @@ jobs:
       - name: Run Daft script from file
         uses: peckjon/daft-script@v1
         with:
-          scriptfile: 'scripts/process_data.py'
+          script_file: 'scripts/process_data.py'
+          # Optional: specify a specific Daft version
+          # daft_version: '0.5.7'
 ```
 
 ## Inputs
 
 ### `script_file`
 
-**Optional** Path to a Python script file that imports and uses the Daft library.
-
-### `script`
-
-**Optional** Content of a Python script that imports and uses the Daft library.
+**Required** Path to a Python script file that imports and uses the Daft library.
 
 ### `daft_version`
 
 **Optional** Version of Daft to install (e.g., '0.2.0'). If not specified, the latest version will be installed.
 
-**Note:** You must provide either `script_file` OR `script`, but not both.
+> **Note:** Only the `script_file` parameter is supported. Inline script content via a `script` parameter is no longer available.
 
 ## Example Scripts
 
-### Example script file (process_data.py)
+### Example script file (`process_data.py`)
 
 ```python
 import daft
 
-# Create a DataFrame from a dictionary
+# Print Daft version for information
+print(f"Using Daft version: {daft.__version__}")
+
+# Create a simple DataFrame
 df = daft.from_pydict({
-    "name": ["Alice", "Bob", "Charlie", "David", "Eve"],
-    "age": [25, 30, 35, 40, 45],
-    "city": ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"],
-    "active": [True, False, True, True, False],
+    "product": ["Laptop", "Phone", "Tablet", "Monitor", "Headphones"],
+    "price": [1200, 800, 350, 400, 150],
+    "in_stock": [True, False, True, True, True],
+    "rating": [4.5, 4.8, 3.9, 4.2, 4.7],
 })
 
-# Perform some operations
-result = df.where(daft.col("age") > 30).select("name", "age", "city")
+# Filter for products that are in stock
+in_stock_df = df.where(daft.col("in_stock") == True)
+
+# Sort by price in descending order
+sorted_df = in_stock_df.sort(daft.col("price"), desc=True)
+
+# Select columns of interest and add a discount column
+result_df = sorted_df.with_column(
+    "discounted_price", 
+    daft.col("price") * 0.9
+).select("product", "price", "discounted_price", "rating")
 
 # Show the results
-print("Results:")
-result.show()
-```
+print("Products in stock (sorted by price):")
+result_df.show()
 
-### Example using script content input
+# Simple statistics - using the appropriate method for aggregations
+print("\nPrice Statistics:")
+stats_df = df.agg(
+    [daft.col("price").min().alias("min_price"),
+     daft.col("price").max().alias("max_price"),
+     daft.col("price").mean().alias("avg_price"),
+     daft.col("price").count().alias("count")]
+)
+stats_df.show()
 
-```yaml
-- name: Run Daft script
-  uses: peckjon/daft-script@v1
-  with:
-    script: |
-      import daft
-      
-      # Set up anonymous access to demo data
-      daft.set_planning_config(default_io_config=daft.io.IOConfig(s3=daft.io.S3Config(anonymous=True)))
-      
-      # Read a sample dataset
-      df = daft.read_parquet("s3://daft-public-data/tutorials/10-min/sample-data-dog-owners-partitioned.pq/**")
-      
-      # Process data
-      result = df.where(daft.col("has_dog") == True).select("first_name", "last_name", "country")
-      
-      # Show results
-      print("Dog owners:")
-      result.show()
+# Show count of products by in-stock status
+print("\nProduct count by in-stock status:")
+in_stock_counts = df.groupby("in_stock").count()
+in_stock_counts.show()
 ```
 
 ## Additional Resources
@@ -138,4 +98,4 @@ result.show()
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details

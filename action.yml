@@ -2,12 +2,9 @@ name: 'Run Daft.ai Script'
 description: 'Run a Python script with the Daft.ai library'
 author: 'Your GitHub Username'
 inputs:
-  script:
-    description: 'Content of a Python script that imports daft'
-    required: false
   script_file:
     description: 'Path to a Python script that imports daft (relative to the repository root)'
-    required: false
+    required: true
   daft_version:
     description: 'Version of Daft to install (default: latest)'
     required: false
@@ -15,17 +12,11 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Validate inputs
+    - name: Validate input
       shell: bash
       run: |
-        SCRIPT_FILE="${{ inputs.script_file }}"
-        SCRIPT="${{ inputs.script }}"
-        if [[ -z "$SCRIPT_FILE" && -z "$SCRIPT" ]]; then
-          echo "Error: Either 'script_file' or 'script' input parameter must be provided."
-          exit 1
-        fi
-        if [[ ! -z "$SCRIPT_FILE" && ! -z "$SCRIPT" ]]; then
-          echo "Error: Both 'script_file' and 'script' input parameters were provided. Please provide only one."
+        if [[ -z "${{ inputs.script_file }}" ]]; then
+          echo "Error: 'script_file' input parameter must be provided."
           exit 1
         fi
     - name: Create requirements file
@@ -50,7 +41,6 @@ runs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     - name: Run script file
-      if: inputs.script_file != ''
       shell: bash
       run: |
         SCRIPT_FILE="${{ inputs.script_file }}"
@@ -59,14 +49,6 @@ runs:
           exit 1
         fi
         python "$SCRIPT_FILE"
-    - name: Run script content
-      if: inputs.script != ''
-      shell: bash
-      run: |
-        TMPFILE=$(mktemp)
-        echo "${{ inputs.script }}" > "$TMPFILE"
-        python "$TMPFILE"
-        rm "$TMPFILE"
 branding:
   icon: 'cpu'
   color: 'purple'
